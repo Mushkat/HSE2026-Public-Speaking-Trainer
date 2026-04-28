@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { loginUser } from "../api/user";
 import { setToken } from "../api/auth";
+import { loginUser } from "../api/user";
+import { t } from "../i18n";
+import "./LoginPage.css";
+import Alert from "../components/ui/Alert";
+import Button from "../components/ui/Button";
+import { Card, CardContent, CardHeader } from "../components/ui/Card";
+import Input from "../components/ui/Input";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -18,46 +24,36 @@ const LoginPage = () => {
     try {
       const data = await loginUser(email, password);
       setToken(data.access_token);
-      navigate("/sessions");
-    } catch (err) {
-      setError("Login failed. Check your credentials.");
+      navigate("/home");
+    } catch {
+      setError(t("auth.login.invalid"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="card">
-      <h1>Welcome back</h1>
-      <p className="muted">Log in to manage your practice sessions.</p>
-      <form onSubmit={handleSubmit} className="form">
-        <label className="field">
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </label>
-        <label className="field">
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
-        {error && <div className="error">{error}</div>}
-        <button type="submit" className="primary" disabled={loading}>
-          {loading ? "Signing in..." : "Login"}
-        </button>
-      </form>
-      <p className="muted">
-        New here? <Link to="/register">Create an account</Link>.
-      </p>
-    </section>
+    <Card className="auth-page">
+      <CardHeader>
+        <div>
+          <h1>{t("auth.login.title")}</h1>
+          <p className="ui-muted">{t("auth.authCardSubtitle")}</p>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="ui-grid">
+          <Input label={t("auth.emailLabel")} type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          <Input label={t("auth.passwordLabel")} type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+          {error ? <Alert tone="danger">{error}</Alert> : null}
+          <Button type="submit" loading={loading}>
+            {t("auth.login.submit")}
+          </Button>
+        </form>
+        <p className="ui-muted">
+          {t("auth.login.firstTime")} <Link to="/register">{t("auth.login.createAccount")}</Link>.
+        </p>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,22 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, sessions
+from app.api.routes import auth, sessions, system
+from app.core.config import settings
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.cors_origins_list,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/health")
 def health() -> dict:
@@ -25,3 +22,4 @@ def health() -> dict:
 
 app.include_router(auth.router)
 app.include_router(sessions.router)
+app.include_router(system.router)

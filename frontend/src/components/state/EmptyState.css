@@ -1,0 +1,2 @@
+.ui-state { display: grid; justify-items: center; gap: 12px; text-align: center; padding: 24px; background: #f8faff; border-radius: var(--radius-md); border: 1px dashed #c6d5ff; }
+.ui-state__icon { width: 50px; height: 50px; border-radius: 50%; background: #edf1ff; display: grid; place-items: center; color: var(--primary); }

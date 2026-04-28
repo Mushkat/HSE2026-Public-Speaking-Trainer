@@ -1,0 +1,6 @@
+.ui-toast-stack { position: fixed; right: 20px; bottom: 20px; display: grid; gap: 8px; z-index: 50; }
+.ui-toast { min-width: 220px; border-radius: 12px; padding: 10px 14px; border: 1px solid var(--border); background: white; box-shadow: var(--shadow-soft); }
+.ui-toast--success { border-color: #8de4dc; }
+.ui-toast--warning { border-color: #ffd57a; }
+.ui-toast--danger { border-color: #ffabc6; }
+.ui-toast--info { border-color: var(--border); }

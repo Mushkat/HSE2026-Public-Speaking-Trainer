@@ -1,0 +1,20 @@
+.exercises-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.exercises-card { border: 1px solid var(--border); border-radius: 14px; padding: 14px; background: var(--surface); display: grid; gap: 10px; box-shadow: var(--shadow); }
+.exercises-platform { margin: 0; }
+.exercises-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.exercises-tag { border: 1px solid var(--border); background: var(--surface-2); border-radius: 999px; padding: 3px 8px; font-size: .78rem; color: var(--text); }
+.exercises-link {
+  width: fit-content;
+  margin-top: 4px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--surface);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+.exercises-link:hover { background: var(--primary-600); border-color: var(--primary-600); }
+.exercises-link:focus-visible { outline: none; box-shadow: var(--focus-ring); }

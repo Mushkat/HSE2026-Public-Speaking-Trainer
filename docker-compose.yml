@@ -1,33 +1,151 @@
-version: "3.9"
+x-backend-image: &backend-image public-speaking-trainer-backend:dev
+x-backend-env: &backend-env
+  DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-speech_trainer}
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+  JWT_SECRET: ${JWT_SECRET:-change-me}
+  JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+  ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+  CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+  STORAGE_ROOT: ${STORAGE_ROOT:-/app/storage}
+  WHISPER_MODEL_SIZE: ${WHISPER_MODEL_SIZE:-small}
+  WHISPER_DEVICE: ${WHISPER_DEVICE:-cpu}
+  WHISPER_COMPUTE_TYPE: ${WHISPER_COMPUTE_TYPE:-int8}
+  WHISPER_MODEL_CACHE_DIR: ${WHISPER_MODEL_CACHE_DIR:-/models/faster-whisper}
+  ASR_LOW_CONF_THRESHOLD: ${ASR_LOW_CONF_THRESHOLD:-0.3}
+  HF_HOME: ${HF_HOME:-/models/huggingface}
+  XDG_CACHE_HOME: ${XDG_CACHE_HOME:-/models/.cache}
+  LOCAL_LLM_ENABLED: ${LOCAL_LLM_ENABLED:-1}
+  LOCAL_LLM_BASE_URL: ${LOCAL_LLM_BASE_URL:-http://llm:8080}
+  LOCAL_LLM_TIMEOUT_SEC: ${LOCAL_LLM_TIMEOUT_SEC:-120}
+  LOCAL_LLM_MAX_RETRIES: ${LOCAL_LLM_MAX_RETRIES:-0}
+  LOCAL_LLM_TEMPERATURE: ${LOCAL_LLM_TEMPERATURE:-0.2}
+  LOCAL_LLM_MAX_TOKENS: ${LOCAL_LLM_MAX_TOKENS:-256}
+  LOCAL_LLM_MAX_TOKENS_QUESTIONS: ${LOCAL_LLM_MAX_TOKENS_QUESTIONS:-180}
+  LOCAL_LLM_MAX_TOKENS_KEYMOMENTS: ${LOCAL_LLM_MAX_TOKENS_KEYMOMENTS:-180}
+  LOCAL_LLM_MAX_INPUT_CHARS: ${LOCAL_LLM_MAX_INPUT_CHARS:-700}
+  LOCAL_LLM_JSON_STRICT: ${LOCAL_LLM_JSON_STRICT:-1}
+  LOCAL_LLM_MAX_PARALLEL_REQUESTS: ${LOCAL_LLM_MAX_PARALLEL_REQUESTS:-1}
+  DEBUG_LLM: ${DEBUG_LLM:-0}
+  DEBUG_LLM_QUALITY: ${DEBUG_LLM_QUALITY:-0}
+x-backend-volumes: &backend-volumes
+  - storage:/app/storage
+  - whisper_models:/models
 
 services:
   db:
     image: postgres:15
+    container_name: speech_trainer_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: speech_trainer
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-speech_trainer}
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-speech_trainer}"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    container_name: speech_trainer_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   api:
-    build: ./backend
-    env_file:
-      - .env
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+    image: *backend-image
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: speech_trainer_api
+    environment: *backend-env
     ports:
       - "8000:8000"
+    volumes: *backend-volumes
     depends_on:
       db:
         condition: service_healthy
-    command: >
-      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+      redis:
+        condition: service_healthy
+    command: ["sh", "-ec", "/app/scripts/start_api.sh"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  worker:
+    image: *backend-image
+    container_name: speech_trainer_worker
+    environment: *backend-env
+    volumes: *backend-volumes
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["sh", "-ec", "/app/scripts/start_worker.sh"]
+
+  llm:
+    image: public-speaking-trainer-llm:cuda
+    build:
+      context: .
+      dockerfile: llm/Dockerfile.llm
+    container_name: speech_trainer_llm
+    profiles: ["llm"]
+    environment:
+      LOCAL_LLM_MODEL_PATH: ${LOCAL_LLM_MODEL_PATH:-/models/model.gguf}
+      LOCAL_LLM_CTX_SIZE: ${LOCAL_LLM_CTX_SIZE:-2048}
+      LOCAL_LLM_N_PREDICT: ${LOCAL_LLM_N_PREDICT:-256}
+      LOCAL_LLM_PARALLEL: ${LOCAL_LLM_PARALLEL:-1}
+      LOCAL_LLM_BATCH_SIZE: ${LOCAL_LLM_BATCH_SIZE:-512}
+      LOCAL_LLM_UBATCH_SIZE: ${LOCAL_LLM_UBATCH_SIZE:-256}
+      LOCAL_LLM_CACHE_TYPE_K: ${LOCAL_LLM_CACHE_TYPE_K:-q8_0}
+      LOCAL_LLM_CACHE_TYPE_V: ${LOCAL_LLM_CACHE_TYPE_V:-q8_0}
+      LOCAL_LLM_THREADS: ${LOCAL_LLM_THREADS:-8}
+      LOCAL_LLM_THREADS_BATCH: ${LOCAL_LLM_THREADS_BATCH:-8}
+      LOCAL_LLM_N_GPU_LAYERS: ${LOCAL_LLM_N_GPU_LAYERS:-24}
+      LOCAL_LLM_TEMP: ${LOCAL_LLM_TEMP:-0.2}
+      LOCAL_LLM_TOP_P: ${LOCAL_LLM_TOP_P:-0.9}
+      LOCAL_LLM_REPEAT_PENALTY: ${LOCAL_LLM_REPEAT_PENALTY:-1.1}
+    volumes:
+      - ./models:/models
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  frontend:
+    build: ./frontend
+    container_name: speech_trainer_frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    ports:
+      - "5173:5173"
+    depends_on:
+      api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:5173"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
+    driver: local
+  storage:
+    driver: local
+  whisper_models:
+    driver: local

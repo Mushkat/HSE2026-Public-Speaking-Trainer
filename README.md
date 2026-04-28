@@ -1,73 +1,210 @@
-# Speech Trainer Backend (Stage 1)
+# Public Speaking Trainer
 
-## Run locally with Docker
+Веб-приложение для тренировки публичных выступлений. Пользователь загружает аудио- или видеозапись выступления, запускает анализ и получает транскрипт, речевые, голосовые и визуальные метрики, а также рекомендации по улучшению выступления.
 
-```bash
-docker compose up --build
-```
+## Возможности
 
-The API will be available at `http://localhost:8000`.
+- Регистрация и авторизация пользователей
+- Создание практик выступлений
+- Выбор сценария тренировки
+- Загрузка аудио/видео
+- Асинхронный анализ записи
+- Распознавание речи и построение транскрипта
+- Анализ темпа, пауз, слов-паразитов, повторов и слабых слов
+- Анализ голоса: вариативность высоты тона и громкости
+- Базовый видеоанализ: центрирование, стабильность, зрительный контакт
+- Просмотр результатов и прогресса по сессиям
+- Повторный анализ после изменения данных
 
-The frontend is available at `http://localhost:5173` after running `npm install` and `npm run dev` in `frontend/`.
+## Демонстрация
 
-### Run migrations manually
+Демонстрационное видео: **https://disk.360.yandex.ru/i/pn3Pldh9Qq69oA**
 
-```bash
-docker compose run --rm api alembic upgrade head
-```
+## Технологический стек
 
-## Run tests
+- Frontend: React, TypeScript, Vite
+- Backend: FastAPI, SQLAlchemy, Pydantic
+- Database: PostgreSQL
+- Queue: Redis + RQ Worker
+- ASR: faster-whisper
+- Audio analysis: librosa, parselmouth
+- Video analysis: OpenCV
+- Optional LLM: локальный LLM-сервис
+- Deployment: Docker Compose
 
-```bash
-cd backend
-pytest
-```
+## Структура проекта
 
-## cURL examples
+```text
+.
+├── backend/          # FastAPI API, модели, сервисы анализа, worker
+├── frontend/         # React/Vite клиентская часть
+├── llm/              # Опциональный локальный LLM-сервис
+├── scripts/          # Smoke/dev scripts
+├── models/           # Локальные модели
+├── docker-compose.yml
+└── docker-compose.gpu.yml
+````
 
-### Register
+## Быстрый запуск
 
-```bash
-curl -X POST http://localhost:8000/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
-```
-
-### Login
-
-```bash
-curl -X POST http://localhost:8000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
-```
-
-### Create session
-
-```bash
-curl -X POST http://localhost:8000/sessions \
-  -H "Authorization: Bearer <TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"First session"}'
-```
-
-### List sessions
+Из корня репозитория:
 
 ```bash
-curl -X GET http://localhost:8000/sessions \
-  -H "Authorization: Bearer <TOKEN>"
+docker compose build
+docker compose up -d
 ```
 
-### Upload session media
+Проверить состояние сервисов:
 
 ```bash
-curl -X POST http://localhost:8000/sessions/<SESSION_ID>/media \
-  -H "Authorization: Bearer <TOKEN>" \
-  -F "file=@/path/to/recording.mp4"
+docker compose ps
 ```
 
-## Upload from the UI
+Посмотреть логи:
 
-1. Register and log in.
-2. Create or open a session.
-3. Use the "Upload media" panel to choose a recording (mp4, mov, webm, mp3, wav; max 500MB).
-4. After upload completes, the file appears in the attached media list and persists after refresh.
+```bash
+docker compose logs -f api worker frontend
+```
+
+## Адреса сервисов
+
+* Frontend: [http://localhost:5173](http://localhost:5173)
+* API health: [http://localhost:8000/health](http://localhost:8000/health)
+* Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+* LLM health, если включён: [http://localhost:8080/health](http://localhost:8080/health)
+
+## Запуск с локальным LLM (рекомендуемый способ запуска)
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.gpu.yml --profile llm up -d --build
+```
+
+Проверка статуса LLM:
+
+```bash
+curl http://localhost:8000/system/llm-status
+```
+
+## Smoke-проверки
+
+```bash
+bash scripts/smoke.sh
+bash scripts/smoke_api.sh
+```
+
+## Работа с базой данных
+
+Открыть `psql` внутри контейнера:
+
+```bash
+docker compose exec db psql -U postgres -d speech_trainer
+```
+
+Полезные запросы:
+
+```sql
+SELECT id, email, created_at
+FROM users
+ORDER BY created_at DESC
+LIMIT 20;
+
+SELECT id, user_id, title, created_at
+FROM sessions
+ORDER BY created_at DESC
+LIMIT 20;
+
+SELECT session_id, status, step, progress, error_message, updated_at
+FROM statuses
+ORDER BY updated_at DESC
+LIMIT 20;
+```
+
+## Основной пользовательский сценарий
+
+1. Зарегистрироваться или войти в аккаунт.
+2. Создать практику.
+3. Выбрать сценарий выступления.
+4. Загрузить аудио- или видеофайл.
+5. Запустить анализ.
+6. Дождаться завершения обработки.
+7. Посмотреть результаты, транскрипт и рекомендации.
+8. При необходимости изменить транскрипт и выполнить повторный анализ.
+
+## Поддерживаемые форматы
+
+* Видео: `mp4`, `mov`, `webm`
+* Аудио: `mp3`, `wav`
+
+Ограничение размера файла: до `500 MB`.
+
+Вот готовый блок, который можно просто вставить в README:
+
+## Локальная LLM-модель
+
+Для генерации коучинговых блоков (рекомендации, вопросы аудитории, ключевые слова и др.) в проекте используется локальная языковая модель.
+
+Используемая модель:
+- https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/blob/main/Meta-Llama-3-8B-Instruct.Q8_0.gguf
+
+### Важно
+
+Файл модели **не включён в репозиторий**, так как имеет большой размер.
+
+### Как подключить модель
+
+1. Скачать `.gguf` файл по ссылке выше
+2. Поместить его в директорию проекта:
+
+```text
+/models
+````
+
+3. Переименовать файл в:
+
+```text
+model.gguf
+```
+
+### Использование
+
+После добавления модели можно запустить сервис с поддержкой LLM:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.gpu.yml --profile llm up -d --build
+```
+
+Проверка статуса после загрузки весов:
+
+```bash
+curl http://localhost:8000/system/llm-status
+```
+
+### Примечания
+
+* LLM используется только для генерации текстовых рекомендаций и не влияет на расчёт базовых метрик.
+* При отсутствии модели система продолжает работать, используя fallback-логику.
+* Качество рекомендаций зависит от выбранной модели и параметров генерации.
+
+
+## Очистка окружения
+
+Остановить контейнеры:
+
+```bash
+docker compose down
+```
+
+Остановить контейнеры и удалить volumes:
+
+```bash
+docker compose down -v
+```
+
+> Важно: `down -v` удаляет данные PostgreSQL, загруженные медиа и кэш моделей.
+
+## Примечания
+
+* Анализ выполняется асинхронно через Redis/RQ worker.
+* Базовые метрики работают без LLM.
+* LLM используется только для дополнительных коучинговых блоков и может быть отключён.
+* Качество анализа зависит от качества записи, шума, освещения и положения пользователя в кадре.

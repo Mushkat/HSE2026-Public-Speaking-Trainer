@@ -1,0 +1,40 @@
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04 AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    build-essential \
+    cmake \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+RUN git clone --depth=1 https://github.com/ggml-org/llama.cpp.git
+WORKDIR /src/llama.cpp
+RUN ln -sf /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
+ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LIBRARY_PATH}
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH}
+RUN cmake -S . -B build -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_EXE_LINKER_FLAGS="-L/usr/local/cuda/lib64/stubs -Wl,-rpath-link,/usr/local/cuda/lib64/stubs" \
+    && cmake --build build --target llama-server -j"$(nproc)"
+
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    wget \
+    pciutils \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY --from=builder /src/llama.cpp/build/bin/llama-server /usr/local/bin/llama-server
+COPY --from=builder /src/llama.cpp/build/bin/libggml*.so* /usr/local/lib/
+COPY --from=builder /src/llama.cpp/build/bin/libllama*.so* /usr/local/lib/
+COPY --from=builder /src/llama.cpp/build/bin/libmtmd*.so* /usr/local/lib/
+COPY llm/start-llm.sh /usr/local/bin/start-llm.sh
+RUN chmod +x /usr/local/bin/start-llm.sh \
+    && ldconfig
+
+EXPOSE 8080
+ENTRYPOINT ["/usr/local/bin/start-llm.sh"]

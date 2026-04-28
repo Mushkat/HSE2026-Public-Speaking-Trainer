@@ -1,0 +1,5 @@
+.ui-alert { border-radius: var(--radius-sm); padding: 10px 12px; font-size: .92rem; }
+.ui-alert--info { background: var(--info-bg); color: var(--info); }
+.ui-alert--success { background: var(--success-bg); color: var(--success); }
+.ui-alert--warning { background: var(--warning-bg); color: var(--warning); }
+.ui-alert--danger { background: var(--danger-bg); color: var(--danger); }

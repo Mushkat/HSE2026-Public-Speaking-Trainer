@@ -1,37 +1,44 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
-import { clearToken, isAuthenticated } from "../api/auth";
+import { isAuthenticated } from "../api/auth";
+import { t } from "../i18n";
+import "./Layout.css";
+import Button from "./ui/Button";
 
 const Layout = () => {
-  const navigate = useNavigate();
   const authenticated = isAuthenticated();
-
-  const handleLogout = () => {
-    clearToken();
-    navigate("/login");
-  };
+  const location = useLocation();
+  const isAuthPage = ["/login", "/register"].includes(location.pathname);
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="logo">Speech Trainer</div>
-        <nav className="nav">
-          {authenticated ? (
-            <>
-              <Link to="/sessions">Sessions</Link>
-              <button type="button" onClick={handleLogout} className="link-button">
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
-            </>
-          )}
-        </nav>
+    <div className={`public-layout ${isAuthPage ? "public-layout--auth" : ""}`}>
+      <header className="public-topbar">
+        <Link to="/" className="app-logo-link">
+          <span className="app-logo">{t("common.brand")}</span>
+        </Link>
+        {!isAuthPage ? (
+          <nav className="app-nav">
+            {authenticated ? (
+              <Link to="/home">
+                <Button variant="secondary">{t("public.openApp")}</Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost">{t("public.login")}</Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="secondary">{t("public.register")}</Button>
+                </Link>
+              </>
+            )}
+            <Link to="/ui">
+              <Button variant="ghost">{t("public.uiKit")}</Button>
+            </Link>
+          </nav>
+        ) : null}
       </header>
-      <main className="main">
+      <main className="public-content">
         <Outlet />
       </main>
     </div>

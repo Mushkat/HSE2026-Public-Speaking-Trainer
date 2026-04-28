@@ -1,0 +1,22 @@
+.ui-button {
+  min-height: 46px;
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  padding: 0 18px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.ui-button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.ui-button:disabled { cursor: not-allowed; opacity: .6; }
+.ui-button--primary { background: var(--primary); color: white; box-shadow: var(--shadow); }
+.ui-button--primary:hover:not(:disabled) { background: var(--primaryHover); }
+.ui-button--secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+.ui-button--ghost { background: transparent; color: var(--text); border-color: transparent; }
+.ui-button--danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+.ui-spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; }

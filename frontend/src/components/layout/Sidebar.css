@@ -1,0 +1,11 @@
+.shell-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; box-shadow: var(--shadow); padding: 22px 14px; display: grid; align-content: start; gap: 24px; }
+.shell-brand { font-size: 1.5rem; font-weight: 800; color: var(--text); padding: 0 12px; }
+.shell-nav { display: grid; gap: 10px; }
+.shell-nav__item { border-radius: 14px; padding: 14px; color: var(--muted); font-weight: 700; font-size: 1.03rem; border: 1px solid transparent; }
+.shell-nav__item:hover { color: var(--muted); }
+.shell-nav__item--active { color: var(--primary); background: var(--surface-2); border-color: var(--border); }
+
+@media (max-width: 980px) {
+  .shell-sidebar { padding: 14px; }
+  .shell-nav { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+}

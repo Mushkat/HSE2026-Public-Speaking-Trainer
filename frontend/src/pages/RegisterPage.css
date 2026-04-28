@@ -1,0 +1,5 @@
+.auth-page { max-width: 460px; width: min(92vw, 460px); margin: 0 auto; }
+.auth-page .ui-card__header { border-bottom: 0; padding-bottom: 8px; }
+.auth-page .ui-card__content { gap: 16px; }
+.auth-page .ui-button { width: 100%; }
+.auth-page .ui-muted a { color: var(--primary); font-weight: 600; }

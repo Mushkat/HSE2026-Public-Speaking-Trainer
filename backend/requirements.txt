@@ -11,3 +11,17 @@ pytest==8.3.3
 httpx==0.27.2
 bcrypt==4.0.1
 python-multipart
+redis==5.0.8
+rq==1.16.2
+
+faster-whisper==1.0.3
+ctranslate2==4.4.0
+
+requests==2.32.3
+huggingface_hub==0.24.7
+
+librosa==0.10.2.post1
+praat-parselmouth==0.4.4
+numpy==1.26.4
+
+opencv-python-headless==4.10.0.84

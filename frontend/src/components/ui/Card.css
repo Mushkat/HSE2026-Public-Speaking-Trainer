@@ -1,0 +1,11 @@
+.ui-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.ui-card__header, .ui-card__content, .ui-card__footer { padding: 18px 20px; }
+.ui-card__header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); border-bottom: 1px solid var(--border); }
+.ui-card__content { display: grid; gap: 18px; }
+.ui-card__footer { border-top: 1px solid var(--border); }

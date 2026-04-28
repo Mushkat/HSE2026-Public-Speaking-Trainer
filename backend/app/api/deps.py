@@ -1,4 +1,5 @@
 from typing import Generator
+import uuid
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -8,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import SessionLocal
 from app.models.user import User
+from app.core.messages_ru import AUTH_INVALID_TOKEN
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -26,7 +28,7 @@ def get_current_user(
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail=AUTH_INVALID_TOKEN,
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -36,7 +38,11 @@ def get_current_user(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = db.get(User, subject)
+    try:
+        user_id = uuid.UUID(subject)
+    except ValueError:
+        raise credentials_exception
+    user = db.get(User, user_id)
     if user is None:
         raise credentials_exception
     return user

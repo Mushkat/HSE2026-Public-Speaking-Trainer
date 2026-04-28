@@ -1,11 +1,15 @@
 
 def test_register_and_login(client):
-    response = client.post("/auth/register", json={"email": "user@example.com", "password": "password123"})
+    response = client.post("/auth/register", json={"email": "user@example.com", "password": "Password123"})
     assert response.status_code == 201
     data = response.json()
     assert data["email"] == "user@example.com"
 
-    login_response = client.post("/auth/login", json={"email": "user@example.com", "password": "password123"})
+    login_response = client.post(
+        "/auth/login",
+        data={"username": "user@example.com", "password": "Password123"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
     assert login_response.status_code == 200
     token_data = login_response.json()
     assert "access_token" in token_data

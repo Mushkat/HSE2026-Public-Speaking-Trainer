@@ -1,0 +1,5 @@
+.ui-badge { font-size: .8rem; border-radius: var(--radius-lg); padding: 4px 11px; text-transform: capitalize; font-weight: 600; }
+.ui-badge--queued { background: var(--warning-bg); color: var(--warning); }
+.ui-badge--processing { background: var(--info-bg); color: var(--primary); }
+.ui-badge--ready { background: var(--success-bg); color: var(--success); }
+.ui-badge--error { background: var(--danger-bg); color: var(--danger); }

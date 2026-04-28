@@ -10,14 +10,29 @@ from app.models.base import Base
 
 
 @pytest.fixture()
-def client():
+def engine():
     engine = create_engine(
         "sqlite+pysqlite:///:memory:",
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
-    TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     Base.metadata.create_all(bind=engine)
+    return engine
+
+
+@pytest.fixture()
+def db_session(engine):
+    TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@pytest.fixture()
+def client(engine):
+    TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
     def override_get_db():
         db = TestingSessionLocal()

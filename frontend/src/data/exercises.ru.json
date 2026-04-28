@@ -1,0 +1,65 @@
+[
+  {
+    "id": "tempo-01",
+    "title": "Как научиться красиво говорить за 12 минут",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/video/0f32d521ba53ca3f2942be1b376fc6e3/",
+    "tags": ["темп речи", "дикция", "уверенность"]
+  },
+  {
+    "id": "pauses-01",
+    "title": "4 приема для четкой дикции",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/video/5f8c56ca88188cd4bef9ab4e61ed47bb/",
+    "tags": ["паузы", "дикция", "чистота речи"]
+  },
+  {
+    "id": "parasites-01",
+    "title": "Четкая дикция: мини-тренинг по сценической речи",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/video/d576595683ff123b5de472a9fdb88a4b/",
+    "tags": ["слова-паразиты", "артикуляция", "произношение"]
+  },
+  {
+    "id": "diction-01",
+    "title": "Как начинать публичное выступление? | 5 шагов к уверенным выступлениям",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/video/44c4a1dfd8c803f62b19116bcb32140f/",
+    "tags": ["структура выступления", "уверенность", "контакт с аудиторией", "паузы", "темп речи"]
+  },
+  {
+    "id": "voice-01",
+    "title": "Мои упражнения для дикции и артикуляции",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/video/f8488d306061da7ec81dd41e70e12fe0/",
+    "tags": ["громкость", "чистота речи", "артикуляция"]
+  },
+  {
+    "id": "confidence-01",
+    "title": "Речевой интенсив 2.0: как развить речь и дикцию",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/video/5a2b18d7946b9233e896772c947ca9c2/",
+    "tags": ["уверенность", "структура", "дикция"]
+  },
+  {
+    "id": "structure-01",
+    "title": "Техника речи — плейлист из 14 коротких видео",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/plst/36059/",
+    "tags": ["структура выступления", "темп речи", "подача"]
+  },
+  {
+    "id": "eye-contact-01",
+    "title": "Канал о публичных выступлениях «Говори как бог»",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/channel/24008934/",
+    "tags": ["взгляд", "контакт с аудиторией", "уверенность"]
+  },
+  {
+    "id": "speech-01",
+    "title": "Дикция. Урок 1",
+    "platform": "RuTube",
+    "url": "https://rutube.ru/video/05122524e27e1d03d93cea6ddaabc8e5/",
+    "tags": ["дикция", "темп речи", "чёткость"]
+  }
+]

@@ -1,0 +1,8 @@
+.llm-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; border-radius: 999px; font-size: .92rem; font-weight: 700; border: 1px solid transparent; background: #f4f7ff; color: var(--text); }
+.llm-chip__dot { width: 10px; height: 10px; border-radius: 999px; }
+.llm-chip--ready { background: #eafaf3; color: #0c7a58; border-color: #bce8d2; }
+.llm-chip--ready .llm-chip__dot { background: #18b892; }
+.llm-chip--starting { background: #fff7e8; color: #9b6807; border-color: #ffd999; }
+.llm-chip--starting .llm-chip__dot { background: #ffb347; }
+.llm-chip--unavailable { background: #f3f5fa; color: #64708b; border-color: #d5ddea; }
+.llm-chip--unavailable .llm-chip__dot { background: #9aa5ba; }

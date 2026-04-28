@@ -13,3 +13,6 @@ venv/
 .idea/
 .vscode/
 backend/storage/
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
