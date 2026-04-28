@@ -1,0 +1,20 @@
+.practice-upload { display: grid; gap: 14px; border: 1px solid var(--border); background: #fafbff; border-radius: 18px; padding: 14px; }
+.practice-scenario-card { display: grid; gap: 10px; border: 1px solid var(--border); background: #fff; border-radius: 14px; padding: 12px; }
+.practice-scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.practice-scenario-grid label { display: grid; gap: 6px; font-size: .9rem; }
+.practice-scenario-grid select { border: 1px solid var(--border); border-radius: 10px; padding: 8px; background: var(--surface); }
+.practice-scenario-free { display: grid; gap: 8px; }
+.practice-scenario-helper { white-space: pre-line; }
+.practice-scenario-checkbox { display: inline-flex; align-items: center; gap: 8px; }
+.practice-upload-toggle { display: inline-flex; gap: 4px; border: 1px solid var(--border); border-radius: 999px; padding: 4px; width: fit-content; background: var(--surface); }
+.practice-toggle-btn { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; cursor: pointer; color: var(--muted); font-weight: 600; }
+.practice-toggle-btn.is-active { background: var(--surface-soft); color: var(--text); }
+.practice-dropzone { border: 1.5px dashed #b8c9ff; border-radius: 16px; min-height: 140px; display: grid; place-content: center; justify-items: center; gap: 6px; cursor: pointer; background: #f7f9ff; text-align: center; padding: 12px; }
+.practice-dropzone--active { border-color: var(--primary); background: #eef2ff; }
+.practice-file-input { display: none; }
+.practice-file-meta { display: flex; justify-content: space-between; gap: 8px; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: #fff; }
+.practice-file-meta__details { display: grid; gap: 2px; }
+.practice-url-upload { display: grid; gap: 8px; }
+@media (max-width: 760px) {
+  .practice-file-meta { flex-direction: column; align-items: flex-start; }
+}

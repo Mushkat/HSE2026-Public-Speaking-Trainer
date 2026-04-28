@@ -1,0 +1,47 @@
+.home-hero { min-height: 240px; }
+.home-hero .ui-card__header {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 220px;
+  border-bottom: 0;
+  position: relative;
+  gap: 24px;
+}
+.home-hero .ui-card__header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+.home-hero .ui-card__header > div:first-child { max-width: 720px; padding-top: 10px; }
+.home-hero-actions { margin-left: auto; padding-right: 12px; }
+.home-main-cta { min-width: 230px; min-height: 50px; padding: 0 22px; font-size: 1rem; font-weight: 700; }
+.home-cta-title { margin-bottom: 10px; font-size: 1.65rem; }
+.home-cta-text, .home-paragraph { font-size: var(--text-base); line-height: 1.65; max-width: 62ch; }
+.home-info-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.home-info-card { height: 100%; }
+.home-info-card .ui-card__header { align-items: stretch; }
+.home-info-card-header { min-height: 120px; display: flex; flex-direction: column; justify-content: flex-start; }
+.home-info-card-header .home-paragraph { margin-top: 6px; }
+.home-info-card .ui-card__content { gap: 16px; padding-top: 0; }
+.home-checklist { list-style: none; display: grid; gap: 10px; }
+.home-checklist li { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--surface); font-size: var(--text-sm); color: var(--text); }
+.session-list { display: grid; gap: 12px; list-style: none; }
+.session-item { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 16px 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.home-session-title { font-weight: 600; }
+@media (max-width: 1100px) { .home-info-columns { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .home-hero .ui-card__header { min-height: auto; align-items: flex-start; flex-wrap: wrap; }
+  .home-hero .ui-card__header > div:last-child { width: 100%; }
+  .home-hero-actions { margin-left: 0; padding-right: 0; }
+  .home-main-cta { width: 100%; }
+  .home-info-card-header { min-height: 0; }
+  .session-item { flex-direction: column; align-items: flex-start; }
+}

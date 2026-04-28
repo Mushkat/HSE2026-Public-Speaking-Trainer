@@ -1,0 +1,14 @@
+.public-layout { min-height: 100vh; padding: 24px; display: grid; grid-template-rows: auto 1fr; gap: 18px; }
+.public-layout--auth { justify-items: center; }
+.public-topbar { max-width: 1100px; margin: 0 auto; width: 100%; background: rgba(255,255,255,0.92); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-soft); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+.public-layout--auth .public-topbar { max-width: 480px; justify-content: center; }
+.public-content { max-width: 1100px; margin: 0 auto; width: 100%; }
+.public-layout--auth .public-content { max-width: 480px; }
+.app-logo { font-weight: 700; color: var(--text); font-size: 1.3rem; }
+.app-nav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .public-layout { padding: 14px; }
+  .public-topbar { flex-direction: column; align-items: flex-start; }
+  .public-layout--auth .public-topbar { align-items: center; }
+}
